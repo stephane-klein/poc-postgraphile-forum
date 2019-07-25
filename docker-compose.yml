@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  postgraphile:
+     build: .
+     ports:
+       - 5000:5000
+     command: --schema forum_example --append-plugins postgraphile-plugin-connection-filter,@graphile-contrib/pg-simplify-inflector --enhance-graphiql
+     environment:
+      DATABASE_URL: postgres://admin:password@postgres:5432/poc-forum
+      JWT_SECRET: secret
+      # DEBUG: postgraphile:graphql,postgraphile:request,postgraphile:postgres*
+
+  graphql-voyager:
+    image: harobed/graphql-voyager:latest
+    ports:
+      - 3001:3001
+    environment:
+      GRAPHQL_ENDPOINT: http://127.0.0.1:5000/graphql
+
+  postgres:
+    image: postgres:11.2-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: poc-forum
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./postgres/:/var/lib/postgresql/
+
+networks:
+   default:
+     name: poc-postgraphile-forum
