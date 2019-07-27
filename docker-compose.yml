@@ -4,7 +4,7 @@ services:
      build: .
      ports:
        - 5000:5000
-     command: --schema forum_example --append-plugins postgraphile-plugin-connection-filter,@graphile-contrib/pg-simplify-inflector --enhance-graphiql
+     command: --cors --schema forum_example --append-plugins postgraphile-plugin-connection-filter,@graphile-contrib/pg-simplify-inflector --enhance-graphiql
      environment:
       DATABASE_URL: postgres://admin:password@postgres:5432/poc-forum
       JWT_SECRET: secret
