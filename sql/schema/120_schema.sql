@@ -26,7 +26,7 @@ create type forum_example.post_topic as enum (
 
 create table forum_example.post (
   id               serial primary key,
-  author_id        integer not null references forum_example.person(id),
+  author_id        integer not null references forum_example.person(id) DEFAULT current_setting('jwt.claims.person_id', true)::integer,
   headline         text not null check (char_length(headline) < 280),
   body             text,
   topic            forum_example.post_topic,
