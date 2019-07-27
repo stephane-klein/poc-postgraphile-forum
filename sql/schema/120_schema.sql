@@ -10,7 +10,8 @@ create table forum_example.person (
   created_at       timestamp default now()
 );
 
-comment on table forum_example.person is 'A user of the forum.';
+
+comment on table forum_example.person is E'@omit create\nA user of the forum.';
 comment on column forum_example.person.id is 'The primary unique identifier for the person.';
 comment on column forum_example.person.first_name is 'The person’s first name.';
 comment on column forum_example.person.last_name is 'The person’s last name.';
