@@ -1,14 +1,13 @@
 version: "3.7"
 services:
   postgraphile:
-     build: .
-     ports:
-       - 5000:5000
-     command: --cors --schema forum_example --append-plugins postgraphile-plugin-connection-filter,@graphile-contrib/pg-simplify-inflector --enhance-graphiql
-     environment:
+    build: .
+    ports:
+      - 5000:5000
+    command: --cors --schema forum_example --append-plugins postgraphile-plugin-connection-filter,@graphile-contrib/pg-simplify-inflector --enhance-graphiql --jwt-token-identifier forum_example_private.jwt_token --retry-on-init-fail --jwt-secret secret --default-role forum_example_anonymous --extended-errors severity,code,detail,hint,position,internalPosition,internalQuery,where,schema,table,column,dataType,constraint,file,line,routine
+    environment:
       DATABASE_URL: postgres://admin:password@postgres:5432/poc-forum
-      JWT_SECRET: secret
-      # DEBUG: postgraphile:graphql,postgraphile:request,postgraphile:postgres*
+      DEBUG: postgraphile:graphql,postgraphile:request,postgraphile:postgres*
 
   graphql-voyager:
     image: harobed/graphql-voyager:latest

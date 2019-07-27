@@ -14,8 +14,8 @@ $ docker-compose up -d postgres
 ```
 
 ```
-$ cat sql/schema.sql | docker-compose exec -T postgres psql -U admin poc-forum
-$ cat sql/demo-data.sql | docker-compose exec -T postgres psql -U admin poc-forum
+$ cat sql/schema/*.sql | docker-compose exec -T postgres psql --quiet -U admin poc-forum
+$ cat sql/demo-data.sql | docker-compose exec -T postgres psql --quiet -U admin poc-forum
 ```
 
 ```
