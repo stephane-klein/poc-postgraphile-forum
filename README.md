@@ -10,13 +10,11 @@ Roadmap:
   - [ ] [Row Security Policies](https://www.postgresql.org/docs/9.6/ddl-rowsecurity.html)
 
 ```
-$ docker-compose up -d postgres
+$ ./scripts/start-pg-and-wait-starting.sh
+$ ./scripts/seed.sh
+$ ./scripts/fixtures.sh
 ```
 
-```
-$ cat sql/schema/*.sql | docker-compose exec -T postgres psql --quiet -U admin poc-forum
-$ cat sql/demo-data.sql | docker-compose exec -T postgres psql --quiet -U admin poc-forum
-```
 
 ```
 $ docker-compose up -d
