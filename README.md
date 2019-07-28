@@ -2,7 +2,7 @@
 
 Roadmap:
 
-- [ ] Based on https://github.com/graphile/postgraphile/tree/master/examples/forum
+- [x] Based on https://github.com/graphile/postgraphile/tree/master/examples/forum
 - [x] Enable [graphql-voyager](https://github.com/APIs-guru/graphql-voyager)
 - [ ] Write sample queries
   - [ ] Query

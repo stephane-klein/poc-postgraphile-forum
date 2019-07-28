@@ -2,161 +2,189 @@
 
 SET client_min_messages TO WARNING;
 
-create table forum_example.person (
-  id               serial primary key,
-  first_name       text not null check (char_length(first_name) < 80),
-  last_name        text check (char_length(last_name) < 80),
-  about            text,
-  created_at       timestamp default now()
+CREATE TABLE forum_example.person (
+  id               UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+  first_name       TEXT NOT NULL CHECK (CHAR_LENGTH(first_name) < 80),
+  last_name        TEXT CHECK (CHAR_LENGTH(last_name) < 80),
+  about            TEXT,
+  created_at       TIMESTAMP DEFAULT NOW()
 );
 
 
-comment on table forum_example.person is E'@omit create\nA user of the forum.';
-comment on column forum_example.person.id is 'The primary unique identifier for the person.';
-comment on column forum_example.person.first_name is 'The person’s first name.';
-comment on column forum_example.person.last_name is 'The person’s last name.';
-comment on column forum_example.person.about is 'A short description about the user, written by the user.';
-comment on column forum_example.person.created_at is 'The time this person was created.';
+COMMENT ON TABLE forum_example.person IS E'@omit create\nA user of the forum.';
+COMMENT ON COLUMN forum_example.person.id IS 'The primary unique identifier for the person.';
+COMMENT ON COLUMN forum_example.person.first_name IS 'The person’s first name.';
+COMMENT ON COLUMN forum_example.person.last_name IS 'The person’s last name.';
+COMMENT ON COLUMN forum_example.person.about IS 'A short description about the user, written by the user.';
+COMMENT ON COLUMN forum_example.person.created_at IS 'The time this person was created.';
 
-create type forum_example.post_topic as enum (
+CREATE TYPE forum_example.post_topic AS ENUM (
   'discussion',
   'inspiration',
   'help',
   'showcase'
 );
 
-create table forum_example.post (
-  id               serial primary key,
-  author_id        integer not null references forum_example.person(id) DEFAULT current_setting('jwt.claims.person_id', true)::integer,
-  headline         text not null check (char_length(headline) < 280),
-  body             text,
+CREATE TABLE forum_example.post (
+  id               UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+  author_id        UUID NOT NULL REFERENCES forum_example.person(id) DEFAULT current_setting('jwt.claims.person_id', true)::UUID,
+  headline         TEXT NOT NULL CHECK (CHAR_LENGTH(headline) < 280),
+  body             TEXT,
   topic            forum_example.post_topic,
-  created_at       timestamp default now()
+  created_at       TIMESTAMP DEFAULT NOW()
 );
 
-comment on table forum_example.post is 'A forum post written by a user.';
-comment on column forum_example.post.id is 'The primary key for the post.';
-comment on column forum_example.post.headline is 'The title written by the user.';
-comment on column forum_example.post.author_id is 'The id of the author user.';
-comment on column forum_example.post.topic is 'The topic this has been posted in.';
-comment on column forum_example.post.body is 'The main body text of our post.';
-comment on column forum_example.post.created_at is 'The time this post was created.';
+COMMENT ON TABLE forum_example.post IS 'A forum post written by a user.';
+COMMENT ON COLUMN forum_example.post.id IS 'The primary key for the post.';
+COMMENT ON COLUMN forum_example.post.headline IS 'The title written by the user.';
+COMMENT ON COLUMN forum_example.post.author_id IS 'The id of the author user.';
+COMMENT ON COLUMN forum_example.post.topic IS 'The topic this has been posted in.';
+COMMENT ON COLUMN forum_example.post.body IS 'The main body text of our post.';
+COMMENT ON COLUMN forum_example.post.created_at IS 'The time this post was created.';
 
-create function forum_example.person_full_name(person forum_example.person) returns text as $$
-  select person.first_name || ' ' || person.last_name
-$$ language sql stable;
+CREATE FUNCTION forum_example.person_full_name(person forum_example.person) RETURNS TEXT AS $$
+  SELECT person.first_name || ' ' || person.last_name
+$$ LANGUAGE SQL STABLE;
 
-comment on function forum_example.person_full_name(forum_example.person) is 'A person’s full name which is a concatenation of their first and last name.';
+COMMENT ON FUNCTION forum_example.person_full_name(forum_example.person) IS 'A person’s full name which is a concatenation of their first and last name.';
 
-create function forum_example.post_summary(
+CREATE FUNCTION forum_example.post_summary(
   post forum_example.post,
-  length int default 50,
-  omission text default '…'
-) returns text as $$
-  select case
-    when post.body is null then null
-    else substr(post.body, 0, length) || omission
-  end
-$$ language sql stable;
+  length INT DEFAULT 50,
+  omission TEXT DEFAULT '…'
+) RETURNS TEXT AS $$
+  SELECT CASE
+    WHEN post.body IS NULL THEN NULL
+    ELSE substr(post.body, 0, length) || omission
+  END
+$$ LANGUAGE SQL STABLE;
 
-comment on function forum_example.post_summary(forum_example.post, int, text) is 'A truncated version of the body for summaries.';
+COMMENT ON FUNCTION forum_example.post_summary(forum_example.post, INT, TEXT) IS 'A truncated version of the body for summaries.';
 
-create function forum_example.person_latest_post(person forum_example.person) returns forum_example.post as $$
-  select post.*
-  from forum_example.post as post
-  where post.author_id = person.id
-  order by created_at desc
-  limit 1
-$$ language sql stable;
+CREATE FUNCTION forum_example.person_latest_post(person forum_example.person) RETURNS forum_example.post AS $$
+  SELECT
+    post.*
+  FROM
+    forum_example.post AS post
+  WHERE
+    post.author_id = person.id
+  ORDER BY
+    created_at DESC
+  LIMIT 1
+$$ LANGUAGE SQL STABLE;
 
-comment on function forum_example.person_latest_post(forum_example.person) is 'Gets the latest post written by the person.';
+COMMENT ON FUNCTION forum_example.person_latest_post(forum_example.person) IS 'Gets the latest post written by the person.';
 
-create function forum_example.search_posts(search text) returns setof forum_example.post as $$
-  select post.*
-  from forum_example.post as post
-  where post.headline ilike ('%' || search || '%') or post.body ilike ('%' || search || '%')
-$$ language sql stable;
+CREATE FUNCTION forum_example.search_posts(search text) RETURNS SETOF forum_example.post AS $$
+  SELECT
+    post.*
+  FROM
+    forum_example.post AS post
+  WHERE
+    post.headline ILIKE ('%' || search || '%') OR
+    post.body ILIKE ('%' || search || '%')
+$$ LANGUAGE SQL STABLE;
 
-comment on function forum_example.search_posts(text) is 'Returns posts containing a given search term.';
+COMMENT ON FUNCTION forum_example.search_posts(text) IS 'Returns posts containing a given search term.';
 
-alter table forum_example.person add column updated_at timestamp default now();
-alter table forum_example.post add column updated_at timestamp default now();
+ALTER TABLE forum_example.person add column updated_at TIMESTAMP DEFAULT NOW();
+ALTER TABLE forum_example.post add column updated_at TIMESTAMP DEFAULT NOW();
 
-create function forum_example_private.set_updated_at() returns trigger as $$
-begin
+CREATE FUNCTION forum_example_private.set_updated_at() RETURNS TRIGGER AS $$
+BEGIN
   new.updated_at := current_timestamp;
-  return new;
-end;
-$$ language plpgsql;
+  RETURN new;
+END;
+$$ LANGUAGE PLPGSQL;
 
-create trigger person_updated_at before update
-  on forum_example.person
-  for each row
-  execute procedure forum_example_private.set_updated_at();
+CREATE trigger person_updated_at BEFORE UPDATE
+  ON forum_example.person
+  FOR EACH ROW
+  EXECUTE PROCEDURE forum_example_private.set_updated_at();
 
-create trigger post_updated_at before update
-  on forum_example.post
-  for each row
-  execute procedure forum_example_private.set_updated_at();
+CREATE trigger post_updated_at BEFORE UPDATE
+  ON forum_example.post
+  FOR EACH ROW
+  EXECUTE PROCEDURE forum_example_private.set_updated_at();
 
-create table forum_example_private.person_account (
-  person_id        integer primary key references forum_example.person(id) on delete cascade,
-  email            text not null unique check (email ~* '^.+@.+\..+$'),
-  password_hash    text not null
+CREATE TABLE forum_example_private.person_account (
+  person_id        UUID PRIMARY KEY REFERENCES forum_example.person(id) ON DELETE CASCADE,
+  email            TEXT NOT NULL UNIQUE CHECK (email ~* '^.+@.+\..+$'),
+  password_hash    TEXT NOT NULL
 );
 
-comment on table forum_example_private.person_account is 'Private information about a person’s account.';
-comment on column forum_example_private.person_account.person_id is 'The id of the person associated with this account.';
-comment on column forum_example_private.person_account.email is 'The email address of the person.';
-comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’s password.';
+COMMENT ON TABLE forum_example_private.person_account IS 'Private information about a person’s account.';
+COMMENT ON COLUMN forum_example_private.person_account.person_id IS 'The id of the person associated with this account.';
+COMMENT ON COLUMN forum_example_private.person_account.email IS 'The email address of the person.';
+COMMENT ON COLUMN forum_example_private.person_account.password_hash IS 'An opaque hash of the person’s password.';
 
-create extension if not exists "pgcrypto";
-
-create function forum_example.register_person(
-  first_name text,
-  last_name text,
-  email text,
-  password text
-) returns forum_example.person as $$
-declare
+CREATE FUNCTION forum_example.register_person(
+  first_name TEXT,
+  last_name TEXT,
+  email TEXT,
+  password TEXT
+) RETURNS forum_example.person AS $$
+DECLARE
   person forum_example.person;
-begin
-  insert into forum_example.person (first_name, last_name) values
-    (first_name, last_name)
-    returning * into person;
+BEGIN
+  INSERT INTO
+    forum_example.person
+  (
+    first_name,
+    last_name
+  )
+  VALUES
+    (
+      first_name,
+      last_name
+    )
+  RETURNING * INTO person;
 
-  insert into forum_example_private.person_account (person_id, email, password_hash) values
-    (person.id, email, crypt(password, gen_salt('bf')));
+  INSERT INTO
+    forum_example_private.person_account
+  (
+    person_id,
+    email,
+    password_hash
+  )
+  VALUES (
+    person.id,
+    email,
+    crypt(password, gen_salt('bf'))
+  );
 
-  return person;
-end;
-$$ language plpgsql strict security definer;
+  RETURN person;
+END;
+$$ LANGUAGE PLPGSQL STRICT SECURITY DEFINER;
 
-comment on function forum_example.register_person(text, text, text, text) is 'Registers a single user and creates an account in our forum.';
+COMMENT ON FUNCTION forum_example.register_person(TEXT, TEXT, TEXT, TEXT) IS 'Registers a single user and creates an account in our forum.';
 
 
-create function forum_example.current_person() returns forum_example.person as $$
-  select *
-  from forum_example.person
-  where id = current_setting('jwt.claims.person_id', true)::integer
-$$ language sql stable;
+CREATE FUNCTION forum_example.current_person() RETURNS forum_example.person AS $$
+  SELECT
+    *
+  FROM
+    forum_example.person
+  WHERE
+    id = current_setting('jwt.claims.person_id', true)::UUID
+$$ LANGUAGE SQL STABLE;
 
-comment on function forum_example.current_person() is 'Gets the person who was identified by our JWT.';
+COMMENT ON FUNCTION forum_example.current_person() IS 'Gets the person who was identified by our JWT.';
 
-create function forum_example.change_password(current_password text, new_password text) 
-returns boolean as $$
-declare
+CREATE FUNCTION forum_example.change_password(current_password TEXT, new_password TEXT) 
+RETURNS BOOLEAN AS $$
+DECLARE
   current_person forum_example.person;
-begin
+BEGIN
   current_person := forum_example.current_person();
-  if exists (select 1 from forum_example_private.person_account where person_account.person_id = current_person.id and person_account.password_hash = crypt($1, person_account.password_hash)) 
-  then
-    update forum_example_private.person_account set password_hash = crypt($2, gen_salt('bf')) where person_account.person_id = current_person.id; 
-    return true;
-  else 
-    return false;
-  end if;
-end;
-$$ language plpgsql strict security definer;
+  IF EXISTS (SELECT 1 FROM forum_example_private.person_account WHERE person_account.person_id = current_person.id AND person_account.password_hash = crypt($1, person_account.password_hash)) 
+  THEN
+    UPDATE forum_example_private.person_account SET password_hash = crypt($2, gen_salt('bf')) WHERE person_account.person_id = current_person.id; 
+    RETURN true;
+  ELSE 
+    RETURN false;
+  END IF;
+END;
+$$ LANGUAGE PLPGSQL STRICT SECURITY DEFINER;
 
 \echo "Schema created"
