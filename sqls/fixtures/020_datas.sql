@@ -26,7 +26,7 @@ INSERT INTO forum_example_private.person_account
   )
     SELECT
       ('1de9c987-08ab-32fe-e218-89c124cd' || to_char(seq, 'FM0000'))::uuid, -- person_id,
-      'username ' || to_char(seq, 'FM000') || '@example.com', -- email
+      'username' || to_char(seq, 'FM000') || '@example.com', -- email
       '$2a$11$27s.UnSqrdSGwYSmacQzcOzjgZJFsmAQRY6OhcHTEWA4pmRFxYEWy' -- crypt('password', gen_salt('bf',11)) I don't use crypt function in fixture to speedup it
     FROM
       GENERATE_SERIES(1, 50) seq;
