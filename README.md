@@ -11,6 +11,7 @@ Roadmap:
 - [ ] Email worker
 - [ ] YouTube screencast
 - [ ] Small React app example
+- [ ] Add [Full Text Search](https://www.postgresql.org/docs/11/textsearch.html) on `post.body`, `post.headline` fields
 
 ```
 $ ./scripts/start-pg-and-wait-starting.sh
