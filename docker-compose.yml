@@ -9,6 +9,13 @@ services:
       DATABASE_URL: postgres://admin:password@postgres:5432/poc-forum
       DEBUG: postgraphile:graphql,postgraphile:request,postgraphile:postgres*
 
+  graphile-worker:
+    build: graphile-worker
+    volumes:
+      - ./graphile-worker/tasks/:/tasks/
+    environment:
+      DATABASE_URL: postgres://admin:password@postgres:5432/poc-forum
+
   graphql-voyager:
     image: harobed/graphql-voyager:latest
     ports:

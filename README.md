@@ -112,3 +112,23 @@ Result:
   }
 }
 ```
+
+## Test worker
+
+```
+$ ./scripts/enter-in-pg.sh
+poc-forum=# SELECT graphile_worker.add_job('hello', json_build_object('name', 'Bobby Tables'));
+                                                                                        add_job
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ (1,ec43b4ee-f950-402e-8fa4-b223388c00bf,hello,"{""name"" : ""Bobby Tables""}",0,"2019-08-09 11:23:56.034334+00",0,25,,"2019-08-09 11:23:56.034334+00","2019-08-09 11:23:56.034334+00")
+(1 row)
+```
+
+See `graphile-worker` logs:
+
+```
+$ docker-compose logs -f graphile-worker
+graphile-worker_1  | Worker connected and looking for jobs... (task names: 'hello')
+graphile-worker_1  | Hello, Bobby Tables
+graphile-worker_1  | Completed task 1 (hello) with success (0.53ms)
+```
