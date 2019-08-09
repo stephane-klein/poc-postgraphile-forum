@@ -1,0 +1,1 @@
+Thanks {{ firstname }} for signing up for GraphileForum!

@@ -8,7 +8,7 @@ Roadmap:
   - [x] Query
   - [x] Mutations
   - [x] [Row Security Policies](https://www.postgresql.org/docs/9.6/ddl-rowsecurity.html)
-- [ ] Integrate [graphile-worker](https://github.com/graphile/worker) to send welcome email
+- [x] Integrate [graphile-worker](https://github.com/graphile/worker) to send welcome email
 - [ ] YouTube screencast
 - [ ] Small React app example
 - [ ] Add [Full Text Search](https://www.postgresql.org/docs/11/textsearch.html) on `post.body`, `post.headline` fields
@@ -28,6 +28,8 @@ Urls:
 - http://0.0.0.0:5000/graphql
 - http://0.0.0.0:5000/graphiql
 - graphql-voyager: http://127.0.0.1:3001/
+- mailhog: http://127.0.0.1:8025
+- send-mail: http://127.0.0.1:5010/
 
 ## Query
 

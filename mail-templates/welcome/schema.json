@@ -1,0 +1,22 @@
+{
+    "type": "object",
+    "required": [
+        "from",
+        "to",
+        "firstname"
+    ],
+    "properties": {
+        "from": {
+            "type": "string",
+            "default": "noreply@example.com"
+        },
+        "to": {
+            "type": "string",
+            "default": "john-doe@example.com"
+        },
+        "firstname": {
+            "type": "string",
+            "default": "John"
+        }
+    }
+}

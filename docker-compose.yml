@@ -15,6 +15,7 @@ services:
       - ./graphile-worker/tasks/:/tasks/
     environment:
       DATABASE_URL: postgres://admin:password@postgres:5432/poc-forum
+      SEND_MAIL_API: http://send-mails:5000
 
   graphql-voyager:
     image: harobed/graphql-voyager:latest
@@ -31,6 +32,21 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - ./postgres/:/var/lib/postgresql/
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  send-mails:
+    image: harobed/poc-send-mails-with-template-and-jsonschema:latest
+    ports:
+     - 5010:5000
+    volumes:
+     - ./mail-templates/:/templates/
+    environment:
+      SMTP_URL: smtp://user:password@mailhog:1025/?pool=true
 
 networks:
    default:
