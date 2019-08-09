@@ -8,7 +8,7 @@ Roadmap:
   - [x] Query
   - [x] Mutations
   - [x] [Row Security Policies](https://www.postgresql.org/docs/9.6/ddl-rowsecurity.html)
-- [ ] Email worker
+- [ ] Integrate [graphile-worker](https://github.com/graphile/worker) to send welcome email
 - [ ] YouTube screencast
 - [ ] Small React app example
 - [ ] Add [Full Text Search](https://www.postgresql.org/docs/11/textsearch.html) on `post.body`, `post.headline` fields
